@@ -1,51 +1,35 @@
 "use client";
 import { useState } from "react";
-
-export default function Page() {
-  const [url, setUrl] = useState("");
-  const [short, setShort] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const pendekin = () => {
-    if (!url) return;
-    setLoading(true);
-    const code = Math.random().toString(36).substring(2, 7);
-    const domain = window.location.origin;
-    setTimeout(() => {
-      setShort(`${domain}/${code}`);
-      setLoading(false);
-      const history = JSON.parse(localStorage.getItem("tautanku") || "[]");
-      history.unshift({ long: url, short: `${domain}/${code}`, code });
-      localStorage.setItem("tautanku", JSON.stringify(history.slice(0, 10)));
-    }, 600);
+export default function Home(){
+  const [nama,setNama]=useState("");
+  const [bio,setBio]=useState("");
+  const [wa,setWa]=useState("");
+  const [ig,setIg]=useState("");
+  const [links,setLinks]=useState([{title:"",url:""}]);
+  const [hasil,setHasil]=useState("");
+  const bikin=()=>{
+    if(!nama||!wa)return alert("Nama & WA wajib diisi oon!");
+    const slug=nama.toLowerCase().replace(/[^a-z0-9]/g,"");
+    const data={nama,bio,wa,ig,links:links.filter(l=>l.title&&l.url)};
+    const all=JSON.parse(localStorage.getItem("tautanku_bio")||"{}");
+    all[slug]=data;
+    localStorage.setItem("tautanku_bio",JSON.stringify(all));
+    setHasil(`${window.location.origin}/${slug}`);
   };
-
-  return (
-    <main style={{ minHeight: "100vh", background: "#0a0a0a", color: "white", display: "flex", flexDirection: "column", alignItems: "center", padding: "40px 20px", fontFamily: "sans-serif" }}>
-      <h1 style={{ fontSize: 48, fontWeight: 800, marginBottom: 8 }}>tautanku<span style={{ color: "#22c55e" }}>.link</span></h1>
-      <p style={{ opacity: 0.6, marginBottom: 40 }}>Pemendek tautan tercepat, gratis, tanpa ribet.</p>
-      
-      <div style={{ background: "#171717", border: "1px solid #262626", borderRadius: 16, padding: 20, width: "100%", maxWidth: 560 }}>
-        <input
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          placeholder="Tempel tautan panjangmu disini..."
-          style={{ width: "100%", background: "#0a0a0a", border: "1px solid #333", borderRadius: 10, padding: "14px 16px", color: "white", outline: "none", fontSize: 16 }}
-        />
-        <button
-          onClick={pendekin}
-          style={{ width: "100%", marginTop: 12, background: "#22c55e", color: "black", fontWeight: 700, borderRadius: 10, padding: 14, border: "none", fontSize: 16, cursor: "pointer" }}
-        >
-          {loading ? "Memendekkan..." : "Pendekin Sekarang →"}
-        </button>
-        {short && (
-          <div style={{ marginTop: 16, background: "#0a0a0a", border: "1px dashed #22c55e", borderRadius: 10, padding: 14, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ color: "#22c55e", fontWeight: 600 }}>{short}</span>
-            <button onClick={() => navigator.clipboard.writeText(short)} style={{ background: "white", color: "black", borderRadius: 6, padding: "6px 12px", border: "none", fontWeight: 600, fontSize: 13 }}>Copy</button>
-          </div>
-        )}
+  return(
+    <main style={{minHeight:"100vh",background:"#0a0a0a",color:"white",padding:20,fontFamily:"sans-serif",maxWidth:500,margin:"0 auto"}}>
+      <h1 style={{fontSize:32,fontWeight:800}}>tautanku<span style={{color:"#22c55e"}}>.bio</span></h1>
+      <p style={{opacity:0.6,marginBottom:20}}>Bikin web bio link 10 detik.</p>
+      <div style={{background:"#171717",padding:16,borderRadius:14,border:"1px solid #262626"}}>
+        <input value={nama} onChange={e=>setNama(e.target.value)} placeholder="Username (contoh: syaiful)" style={{width:"100%",background:"#0a0a0a",border:"1px solid #333",borderRadius:8,padding:"12px 14px",color:"white",outline:"none",fontSize:14,marginTop:10}}/>
+        <input value={bio} onChange={e=>setBio(e.target.value)} placeholder="Bio (Jualan Parfum Cirebon)" style={{width:"100%",background:"#0a0a0a",border:"1px solid #333",borderRadius:8,padding:"12px 14px",color:"white",outline:"none",fontSize:14,marginTop:10}}/>
+        <input value={wa} onChange={e=>setWa(e.target.value)} placeholder="No WA 628xxxx" style={{width:"100%",background:"#0a0a0a",border:"1px solid #333",borderRadius:8,padding:"12px 14px",color:"white",outline:"none",fontSize:14,marginTop:10}}/>
+        <input value={ig} onChange={e=>setIg(e.target.value)} placeholder="IG username" style={{width:"100%",background:"#0a0a0a",border:"1px solid #333",borderRadius:8,padding:"12px 14px",color:"white",outline:"none",fontSize:14,marginTop:10}}/>
+        {links.map((l,i)=><div key={i} style={{display:"flex",gap:8,marginTop:10}}><input value={l.title} onChange={e=>{const n=[...links];n[i].title=e.target.value;setLinks(n)}} placeholder="Judul" style={{width:"100%",background:"#0a0a0a",border:"1px solid #333",borderRadius:8,padding:"12px 14px",color:"white",outline:"none",fontSize:14,flex:1}}/><input value={l.url} onChange={e=>{const n=[...links];n[i].url=e.target.value;setLinks(n)}} placeholder="https://" style={{width:"100%",background:"#0a0a0a",border:"1px solid #333",borderRadius:8,padding:"12px 14px",color:"white",outline:"none",fontSize:14,flex:1}}/></div>)}
+        <button onClick={()=>setLinks([...links,{title:"",url:""}])} style={{marginTop:10,fontSize:13,opacity:0.7,background:"none",border:"1px dashed #333",color:"white",padding:"6px 10px",borderRadius:6,width:"100%"}}>+ Tombol</button>
+        <button onClick={bikin} style={{width:"100%",marginTop:16,background:"#22c55e",color:"black",fontWeight:800,padding:14,borderRadius:10,border:"none"}}>Bikin Web Ku</button>
+        {hasil&&<div style={{marginTop:16,background:"#0a0a0a",border:"1px solid #22c55e",padding:12,borderRadius:10}}><p style={{fontSize:12,opacity:0.6}}>Jadi! Link lu:</p><p style={{color:"#22c55e",fontWeight:700,wordBreak:"break-all"}}>{hasil}</p><button onClick={()=>{navigator.clipboard.writeText(hasil);alert("ke-copy!")}} style={{marginTop:8,background:"white",color:"black",padding:"6px 12px",borderRadius:6,border:"none",fontWeight:700}}>Copy</button></div>}
       </div>
-      <p style={{ marginTop: 30, fontSize: 13, opacity: 0.4 }}>Versi 1.0 - Dibuat oleh syaifullah5228</p>
     </main>
   );
 }
